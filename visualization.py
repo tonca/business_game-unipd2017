@@ -6,7 +6,7 @@ import pickle
 
 from sklearn import decomposition
 
-savedfile = 'resources/preprocessed.sav'
+savedfile = 'resources/preprocessed_train.sav'
 file = open(savedfile,'r')
 dataset = pickle.load(file)
 

@@ -93,10 +93,11 @@ X_score = var_selector.transform(X_score)
 print X.shape
 
 
-from sklearn.feature_selection import SelectKBest
+
+from sklearn.feature_selection import SelectPercentile
 from sklearn.feature_selection import f_classif
 
-univ_selector = SelectKBest(f_classif, k=10)
+univ_selector = SelectPercentile(f_classif, percentile=20)
 univ_selector.fit(X, Y)
 X = univ_selector.transform(X)
 X_score = univ_selector.transform(X_score)

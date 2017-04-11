@@ -65,23 +65,25 @@ def choose_C_gamma(X, Y, n_folds=5, kernel='linear', C_range=[1e-2,1,1e2], gamma
 # model.fit(Xtr, Ytr)
 
 
-from sklearn import linear_model
+# from sklearn import linear_model
 
-# define a logistic regression model with very high C parameter -> low impact from regularization
-model = linear_model.LogisticRegressionCV(solver='newton-cg', class_weight='balanced')
+# # define a logistic regression model with very high C parameter -> low impact from regularization
+# model = linear_model.LogisticRegressionCV(solver='newton-cg', class_weight='balanced')
 
-#fit the model on training data
-model.fit(X, Y)
-
-
-# model = linear_model.RidgeClassifierCV()
-# model.fit(X, Y) 
+# #fit the model on training data
+# model.fit(X, Y)
 
 
 # from sklearn.ensemble import AdaBoostClassifier
 
 # model = AdaBoostClassifier()
 # model.fit(X,Y)
+
+
+from sklearn.ensemble import RandomForestClassifier
+
+model = RandomForestClassifier()
+model.fit(X,Y)
 
 
 # # Naive Bayes Classifier
