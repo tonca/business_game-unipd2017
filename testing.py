@@ -28,9 +28,10 @@ pred_te = model.predict(Xte)
 print "Test Accuracy:", metrics.accuracy_score(Yte, pred_te)
 
 # compute AUC 
+from sklearn.metrics import confusion_matrix
+print confusion_matrix(Yte, pred_te)
+
 fpr, tpr, thresholds = roc_curve(Yte, pred_te)
-print fpr
-print tpr
 print "The AUC score is "
 print auc(fpr, tpr)
 
