@@ -32,20 +32,7 @@ print X.shape
 print Xsc.shape
 print Xsc
 
-## PREPROCESSING
-
-# # Undersampling training_set
-# zero_indices = np.where(Y == 0)[0]
-# ones_indices = np.where(Y == 1)[0]
-# random_indices = np.random.choice(zero_indices, 2, replace=False)
-# healthy_sample = X[random_indices]
-# sample_size = sum(Y == 1)  # Equivalent to len(data[data.Healthy == 0])
-# random_indices = np.random.choice(zero_indices, sample_size, replace=False)
-# print 'sample size: '
-# print sample_size
-# undersampling_indexes =  np.concatenate((random_indices,ones_indices))
-# X = X[undersampling_indexes,:]
-# Y = Y[undersampling_indexes]
+# PREPROCESSING
 
 from sklearn import preprocessing
 
@@ -57,7 +44,7 @@ def create_nanmask(col):
 from sklearn.cross_validation import train_test_split 	
 
 # Split data into train (50 samples) and test data (the rest)
-Ntr = 20000
+Ntr = np.floor(len(X)*0.8)
 print Ntr 	
 Nte = N - Ntr
 
@@ -107,15 +94,62 @@ Xte = var_selector.transform(Xte)
 Xsc = var_selector.transform(Xsc)
 
 
+# PCA regularization
+from sklearn import decomposition
+
+# pca = decomposition.PCA(n_components=80)
+
+# pca.fit(Xtr)
+# Xtr = pca.transform(Xtr)
+# Xte = pca.transform(Xte)
+# Xsc = pca.transform(Xsc)
+
 from sklearn.feature_selection import SelectPercentile
 from sklearn.feature_selection import f_classif
 
-univ_selector = SelectPercentile(f_classif, percentile=20)
+univ_selector = SelectPercentile(f_classif, percentile=40)
 univ_selector.fit(Xtr, Ytr)
 Xtr = univ_selector.transform(Xtr)
 Xte = univ_selector.transform(Xte)
 Xsc = univ_selector.transform(Xsc)
+print Xtr.shape
 
+# Undersampling training_set
+def undersampling(X_set, Y_set):	
+	zero_indices = np.where(Y_set == 0)[0]
+	ones_indices = np.where(Y_set == 1)[0]
+	random_indices = np.random.choice(zero_indices, 2, replace=False)
+	healthy_sample = X_set[random_indices]
+	sample_size = sum(Y_set == 1)  # Equivalent to len(data[data.Healthy == 0])
+	random_indices = np.random.choice(zero_indices, sample_size, replace=True)
+	print 'sample size: '
+	print sample_size
+	undersampling_indexes =  np.concatenate((random_indices,ones_indices))
+	X_set = X_set[undersampling_indexes,:]
+	Y_set = Y_set[undersampling_indexes]
+	return X_set, Y_set
+
+# Oversampling 
+def oversampling(X_set, Y_set):
+
+	zero_indices = np.where(Y_set == 0)[0]
+	ones_indices = np.where(Y_set == 1)[0]
+
+	bootstrap_ones = np.random.choice(ones_indices, len(zero_indices)-len(ones_indices))
+	oversampling_indices = np.concatenate((zero_indices, ones_indices, bootstrap_ones))
+	np.random.shuffle(oversampling_indices)
+	X_set = X_set[oversampling_indices, :]
+	Y_set = Y_set[oversampling_indices]
+
+	print X_set.shape
+	print Y_set.shape
+
+
+	return X_set, Y_set
+
+# Oversampling or Undersampling
+Xtr, Ytr = oversampling(Xtr, Ytr)
+# Xtr, Ytr = undersampling(Xtr, Ytr)
 
 # Save data
 trainfile = 'resources/preprocessed_train.sav'
