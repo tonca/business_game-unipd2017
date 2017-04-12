@@ -11,7 +11,7 @@ X = dataset['X']
 Y = dataset['Y']
 
 
-mod_i = 0
+mod_i = '0'
 if len(sys.argv) > 1 :
 	mod_i = sys.argv[1]
 
@@ -31,9 +31,9 @@ models = {
     '0' : LogisticRegressionCV(solver='newton-cg', class_weight='balanced'),
     '1' : AdaBoostClassifier(),
     '2' : GaussianNB(),
-    '3' : RandomForestClassifier(),
+    '3' : RandomForestClassifier(max_features=0.9, n_estimators=15, min_samples_leaf=10, verbose=10),
     '4' : BaggingClassifier(KNeighborsClassifier(), max_samples=0.5, max_features=0.5),
-    '5' : ExtraTreesClassifier(),
+    '5' : ExtraTreesClassifier(n_estimators=15, max_features=0.99, min_samples_leaf=100, verbose=10),
     '6' : GradientBoostingClassifier()
 }
 
