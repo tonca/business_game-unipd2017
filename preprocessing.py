@@ -30,11 +30,13 @@ X = Data[:N,2:]
 Xsc = Score[:,2:]
 print X.shape
 print Xsc.shape
-print X[0:5,:] 
+print X[0:50,:] 
+
 
 # PREPROCESSING
 
 from sklearn import preprocessing
+
 
 # Encoding Labels
 def label_encoding(entry_set):
@@ -54,6 +56,41 @@ def label_encoding(entry_set):
 			print entry_set[0,i]
 
 	return entry_set
+
+
+def binarized_encoding(entry_set):
+	labeler = preprocessing.MultiLabelBinarizer()
+
+	new_ft = np.array([])
+	substituted = np.array([])	
+
+	# Encoding labels
+	for i in range(len(entry_set[0,:])):
+		if isinstance(entry_set[0,i], (str, unicode)):
+			ft = entry_set[:,i]
+			print ft
+			print ft.shape
+			print new_ft.shape
+			ft = ft.astype(str)
+			labeler.fit(ft)
+			if len(new_ft)==0:
+				new_ft = labeler.transform(ft)
+			else:
+				new_ft = np.hstack((labeler.transform(ft), new_ft))
+			substituted = np.append(substituted, i)
+
+	entry_set = np.delete(entry_set, substituted, axis=1)
+	entry_set = np.hstack((entry_set, new_ft))
+
+	print entry_set.shape
+
+	print "Still string?"
+	for i in range(len(entry_set[0,:])):
+		if isinstance(entry_set[0,i], (str, unicode)):
+			print entry_set[0,i]
+
+	return entry_set
+
 
 X = label_encoding(X)
 Xsc = label_encoding(Xsc)

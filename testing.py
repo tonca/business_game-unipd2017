@@ -26,3 +26,14 @@ pred_te = model.predict(Xte)
 print "MAE:", metrics.mean_absolute_error(Yte, pred_te)
 print "MSE:", metrics.mean_squared_error(Yte, pred_te)
 print "r2: ", metrics.r2_score(Yte, pred_te)
+
+
+import matplotlib.pyplot as plt
+from sklearn import decomposition
+
+pca = decomposition.PCA(n_components=1)
+
+X_pca = pca.fit_transform(Xte)
+plt.scatter(Yte, X_pca, c=plt.cm.RdBu_r(0), s=80)
+
+plt.show()

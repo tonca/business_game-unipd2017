@@ -31,9 +31,9 @@ from sklearn.ensemble import ExtraTreesRegressor
 models = {
     '1' : LinearRegression(),
     '2' : RidgeCV(alphas=(0.1, 0.5, 50.0)),
-    '3' : RandomForestRegressor(n_estimators=100, min_samples_leaf=50, verbose=10),
+    '3' : RandomForestRegressor(n_estimators=100, min_samples_leaf=40),
     '4' : LassoCV(),
-    '5' : ExtraTreesRegressor(n_estimators=100, min_samples_leaf=50, verbose=10)
+    '5' : ExtraTreesRegressor(n_estimators=100, min_samples_leaf=50)
 }
 
 #fit the model on training data
