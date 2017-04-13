@@ -17,21 +17,12 @@ Yte = score_data['Y']
 
 # TESTING
 from sklearn import metrics
-from sklearn.metrics import roc_curve, auc, roc_auc_score
-
 
 #prediction on test data
 pred_te = model.predict(Xte)
 
 
 # compute accuracy as suggested above using metrics.accuracy_score from scikit-learn for test dataset
-print "Test Accuracy:", metrics.accuracy_score(Yte, pred_te)
-
-# compute AUC 
-from sklearn.metrics import confusion_matrix
-print confusion_matrix(Yte, pred_te)
-
-fpr, tpr, thresholds = roc_curve(Yte, pred_te)
-print "The AUC score is "
-print auc(fpr, tpr)
-
+print "MAE:", metrics.mean_absolute_error(Yte, pred_te)
+print "MSE:", metrics.mean_squared_error(Yte, pred_te)
+print "r2: ", metrics.r2_score(Yte, pred_te)

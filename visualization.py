@@ -13,12 +13,14 @@ dataset = pickle.load(file)
 X = dataset['X']
 Y = dataset['Y']
 
+print X[0,0:5]
 
-pca = decomposition.PCA(n_components=2)
+
+pca = decomposition.PCA(n_components=1)
 
 X_pca = pca.fit_transform(X)
 
-plt.scatter(X_pca[Y==0, 0], X_pca[Y==0, 1], c=plt.cm.RdBu_r(0), s=80)
-plt.scatter(X_pca[Y==1, 0], X_pca[Y==1, 1], c=plt.cm.RdBu_r(256), s=80)
+plt.scatter(Y, X[:,0], c=plt.cm.RdBu_r(0), s=80)
 
 plt.show()
+

@@ -8,11 +8,11 @@ import numpy as np
 import pickle
 
 ## DATA IMPORT 
-df = pd.read_csv('datasets/ctrainset.csv', sep = ',')
-df_score = pd.read_csv('datasets/cscoreset.csv', sep = ',')
+df = pd.read_table('datasets/TRAIN.txt')
+df_score = pd.read_table('datasets/TEST0.txt')
 
-
-df.dropna() 
+# df = np.array(df)
+# df.dropna() 
 
 print df.shape
 print df.describe()
@@ -25,16 +25,38 @@ Score = df_score.values
 
 #N = number of input samples
 N = 30000
-Y = Data[:N,0]
-X = Data[:N,1:]
-Xsc = Score[:,0:]
+Y = Data[:N,1]
+X = Data[:N,2:]
+Xsc = Score[:,2:]
 print X.shape
 print Xsc.shape
-print Xsc
+print X[0:5,:] 
 
 # PREPROCESSING
 
 from sklearn import preprocessing
+
+# Encoding Labels
+def label_encoding(entry_set):
+
+	labeler = preprocessing.LabelEncoder()
+
+	# Encoding labels
+	for i in range(len(entry_set[0,:])):
+		if isinstance(entry_set[0,i], (str, unicode)):
+			ft = entry_set[:,i]
+			labeler.fit(ft)
+			entry_set[:,i] = labeler.transform(ft)
+
+	print "Still string?"
+	for i in range(len(entry_set[0,:])):
+		if isinstance(entry_set[0,i], (str, unicode)):
+			print entry_set[0,i]
+
+	return entry_set
+
+X = label_encoding(X)
+Xsc = label_encoding(Xsc)
 
 # Add rows for Nan values
 def create_nanmask(col):
@@ -50,24 +72,24 @@ Nte = N - Ntr
 
 Xtr, Xte, Ytr, Yte = train_test_split(X, Y, test_size=Nte/N)
 
-def add_nanmask(X_set):
-	nanmask = np.apply_along_axis( create_nanmask, axis=1, arr=X_set )
-	return np.hstack((X_set, nanmask))
+# def add_nanmask(X_set):
+# 	nanmask = np.apply_along_axis( create_nanmask, axis=1, arr=X_set )
+# 	return np.hstack((X_set, nanmask))
 
-Xtr = add_nanmask(Xtr)
-Xte = add_nanmask(Xte)
-Xsc = add_nanmask(Xsc)
+# Xtr = add_nanmask(Xtr)
+# Xte = add_nanmask(Xte)
+# Xsc = add_nanmask(Xsc)
 
 
-# Deleting least complete features
-nan_floor = np.floor(len(Xtr[:,0])*0.5)
-ft_nan = np.array([np.count_nonzero(~np.isnan(Xtr[:,i])) for i in range(len(Xtr[0]))])
-print ft_nan.shape
-ft_nanmask = np.where(ft_nan < nan_floor)
+# # Deleting least complete features
+# nan_floor = np.floor(len(Xtr[:,0])*0.5)
+# ft_nan = np.array([np.count_nonzero(~np.isnan(Xtr[:,i])) for i in range(len(Xtr[0]))])
+# print ft_nan.shape
+# ft_nanmask = np.where(ft_nan < nan_floor)
 
-Xtr = np.delete(Xtr, ft_nanmask, axis=1)
-Xte = np.delete(Xte, ft_nanmask, axis=1)
-Xsc = np.delete(Xsc, ft_nanmask, axis=1)
+# Xtr = np.delete(Xtr, ft_nanmask, axis=1)
+# Xte = np.delete(Xte, ft_nanmask, axis=1)
+# Xsc = np.delete(Xsc, ft_nanmask, axis=1)
 
 
 # Fill empty (NaN) cells with mean
@@ -75,13 +97,6 @@ imputer = preprocessing.Imputer().fit(Xtr)
 Xtr = imputer.transform(Xtr)
 Xte = imputer.transform(Xte)
 Xsc = imputer.transform(Xsc)
-
-
-# L2 Normalization
-scaler = preprocessing.Normalizer().fit(Xtr)
-Xtr = scaler.transform(Xtr)
-Xte = scaler.transform(Xte)
-Xsc = scaler.transform(Xsc)
 
 
 # Remove low-variance features
@@ -114,42 +129,6 @@ Xte = univ_selector.transform(Xte)
 Xsc = univ_selector.transform(Xsc)
 print Xtr.shape
 
-# Undersampling training_set
-def undersampling(X_set, Y_set):	
-	zero_indices = np.where(Y_set == 0)[0]
-	ones_indices = np.where(Y_set == 1)[0]
-	random_indices = np.random.choice(zero_indices, 2, replace=False)
-	healthy_sample = X_set[random_indices]
-	sample_size = sum(Y_set == 1)  # Equivalent to len(data[data.Healthy == 0])
-	random_indices = np.random.choice(zero_indices, sample_size, replace=True)
-	print 'sample size: '
-	print sample_size
-	undersampling_indexes =  np.concatenate((random_indices,ones_indices))
-	X_set = X_set[undersampling_indexes,:]
-	Y_set = Y_set[undersampling_indexes]
-	return X_set, Y_set
-
-# Oversampling 
-def oversampling(X_set, Y_set):
-
-	zero_indices = np.where(Y_set == 0)[0]
-	ones_indices = np.where(Y_set == 1)[0]
-
-	bootstrap_ones = np.random.choice(ones_indices, len(zero_indices)-len(ones_indices))
-	oversampling_indices = np.concatenate((zero_indices, ones_indices, bootstrap_ones))
-	np.random.shuffle(oversampling_indices)
-	X_set = X_set[oversampling_indices, :]
-	Y_set = Y_set[oversampling_indices]
-
-	print X_set.shape
-	print Y_set.shape
-
-
-	return X_set, Y_set
-
-# Oversampling or Undersampling
-Xtr, Ytr = oversampling(Xtr, Ytr)
-# Xtr, Ytr = undersampling(Xtr, Ytr)
 
 # Save data
 trainfile = 'resources/preprocessed_train.sav'
